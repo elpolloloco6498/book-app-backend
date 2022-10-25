@@ -5,8 +5,9 @@ const {uploadFile, deleteFile} = require("../s3")
 const fs = require("fs")
 
 const addBook = async(req, res) => {
+    console.log("Adding a book...")
     const file = req.file
-    const uploadFileInfo = await uploadFile(file)
+    /*const uploadFileInfo = await uploadFile(file)
     console.log(uploadFileInfo)
     const bookData = req.body
     bookData.bookImg = uploadFileInfo.Location
@@ -18,6 +19,7 @@ const addBook = async(req, res) => {
     })
     const book = await new Books(bookData).save()
     res.send(book)
+    */
 }
 
 const updateBook = async(req, res) => {
