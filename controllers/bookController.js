@@ -7,19 +7,19 @@ const fs = require("fs")
 const addBook = async(req, res) => {
     console.log("Adding a book...")
     const file = req.file
-    /*const uploadFileInfo = await uploadFile(file)
+    const uploadFileInfo = await uploadFile(file)
     console.log(uploadFileInfo)
-    const bookData = req.body
-    bookData.bookImg = uploadFileInfo.Location
-    bookData.key = uploadFileInfo.key
-
     // deleting temp file
     fs.unlink(file.path, ()=>{
         console.log("temp file deleted")
     })
+
+    const bookData = req.body
+    bookData.bookImg = uploadFileInfo.Location
+    bookData.key = uploadFileInfo.key
+
     const book = await new Books(bookData).save()
     res.send(book)
-    */
 }
 
 const updateBook = async(req, res) => {
