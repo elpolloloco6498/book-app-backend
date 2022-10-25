@@ -1,29 +1,66 @@
 const { default: mongoose } = require("mongoose")
 const Books = require("../model/bookSchema")
+const {uploadFile, deleteFile} = require("../s3")
+
+const fs = require("fs")
 
 const addBook = async(req, res) => {
+    const file = req.file
+    const uploadFileInfo = await uploadFile(file)
+    console.log(uploadFileInfo)
     const bookData = req.body
-    bookData.bookImg = req.file.path
-    console.log(bookData)
+    bookData.bookImg = uploadFileInfo.Location
+    bookData.key = uploadFileInfo.key
+
+    // deleting temp file
+    fs.unlink(file.path, ()=>{
+        console.log("temp file deleted")
+    })
     const book = await new Books(bookData).save()
     res.send(book)
 }
 
 const updateBook = async(req, res) => {
-    // delete previous image in uploads
+    const id = req.params.id
+    const file = req.file
+    const uploadFileInfo = await uploadFile(file)
+    // deleting temp file
+    fs.unlink(file.path, ()=>{
+        console.log("temp file deleted")
+    })
+    console.log(uploadFileInfo)
+
+    // get previous book
+    const bookToDelete = await Books.findById(id);
+
+    // updating book
     const bookUpdated = req.body
-    bookUpdated.bookImg = req.file.path
+    bookUpdated.bookImg = uploadFileInfo.Location
+    bookUpdated.key = uploadFileInfo.key
     const book = await Books.findOneAndUpdate(
-        {"_id": req.params.id},
+        {"_id": id},
         bookUpdated,
         {returnOriginal: false}
     )
+
+    // delete previous cover image in s3 bucket
+    await deleteFile(bookToDelete.key)
+
     res.send(book)
 }
 
 const deleteBook = async(req, res) => {
-    // delete image in uploads
-    await Books.deleteOne({"_id": req.params.id})
+    console.log("Deleting book...")
+    const id = req.params.id
+
+    // get key from id in database
+    const bookToDelete = await Books.findById(id);
+
+    // delete image in s3 bucket
+    await deleteFile(bookToDelete.key)
+
+    // delete database entry
+    await Books.deleteOne({"_id": id})
     res.status(200).json("Book deleted")
 }
 

@@ -8,7 +8,8 @@ const booksSchema = new mongoose.Schema({
     author: String,
     date: String,
     genre: String,
-    bookImg: String
+    bookImg: String,
+    key: String
 })
 
 module.exports = mongoose.model("Books", booksSchema)
